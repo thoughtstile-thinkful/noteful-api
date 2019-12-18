@@ -68,15 +68,14 @@ foldersRouter
       .catch(next);
   })
   .patch(jsonParser, (req, res, next) => {
-    const { title, content, style } = req.body;
-    const folderToUpdate = { title, content, style };
+    const { name } = req.body;
+    const folderToUpdate = { name };
 
     const numberOfValues = Object.values(folderToUpdate).filter(Boolean).length;
     if (numberOfValues === 0) {
       return res.status(400).json({
         error: {
-          message:
-            "Request body must contain either 'title', 'style' or 'content'"
+          message: "Request body must contain 'name'"
         }
       });
     }

@@ -28,7 +28,6 @@ notesRouter
     const newNote = { name, modified, content };
 
     for (const [key, value] of Object.entries(newNote)) {
-      // eslint-disable-next-line eqeqeq
       if (value == null) {
         return res.status(400).json({
           error: { message: `Missing '${key}' in request body` }
@@ -72,15 +71,15 @@ notesRouter
       .catch(next);
   })
   .patch(jsonParser, (req, res, next) => {
-    const { title, content, style } = req.body;
-    const noteToUpdate = { title, content, style };
+    const { name, modified, content } = req.body;
+    const noteToUpdate = { name, modified, content };
 
     const numberOfValues = Object.values(noteToUpdate).filter(Boolean).length;
     if (numberOfValues === 0) {
       return res.status(400).json({
         error: {
           message:
-            "Request body must contain either 'title', 'style' or 'content'"
+            "Request body must contain either 'name', 'modified' or 'content'"
         }
       });
     }

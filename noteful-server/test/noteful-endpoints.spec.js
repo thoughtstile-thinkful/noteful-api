@@ -67,7 +67,7 @@ describe('Folders Endpoints', function() {
     });
   });
 
-  // Given an XSS Attack Example Passed
+  // Given an XSS Attack Folder Passed
 
   describe('GET /api/folders/:folder_id', () => {
     context('Given no folder', () => {
@@ -79,7 +79,7 @@ describe('Folders Endpoints', function() {
       });
     });
 
-    context('Given there are examples in the database', () => {
+    context('Given there are folders in the database', () => {
       const testNotes = makeNotesArray();
       const testFolders = makeFoldersArray();
 
@@ -92,7 +92,7 @@ describe('Folders Endpoints', function() {
           });
       });
 
-      it('responds with 200 and the specified example', () => {
+      it('responds with 200 and the specified folder', () => {
         const folder_id = 'b0715efe-ffaf-11e8-8eb2-f2801f1b9fd1';
         const expectedFolder = testFolders.find(
           folder => (folder.id = folder_id)
@@ -105,7 +105,7 @@ describe('Folders Endpoints', function() {
   });
 
   describe('POST /api/folders', () => {
-    it('creates an example, responding with 201 and the new example', () => {
+    it('creates an folder, responding with 201 and the new folder', () => {
       const newFolder = {
         name: 'Potato'
       };
@@ -123,6 +123,25 @@ describe('Folders Endpoints', function() {
             .get(`/api/folders/${res.body.id}`)
             .expect(res.body)
         );
+    });
+
+    const requiredFields = ['name'];
+
+    requiredFields.forEach(field => {
+      const newFolder = {
+        name: 'Potato'
+      };
+
+      it(`responds with 400 and an error message when the '${field}' is missing`, () => {
+        delete newFolder[field];
+
+        return supertest(app)
+          .post('/api/folders')
+          .send(newFolder)
+          .expect(400, {
+            error: { message: `Missing '${field}' in request body` }
+          });
+      });
     });
   });
 
