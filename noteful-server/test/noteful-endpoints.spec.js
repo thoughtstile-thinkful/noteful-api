@@ -39,22 +39,27 @@ describe('Folders Endpoints', function() {
     });
 
     context('Given there are folders in the database', () => {
-      // const testUsers = makeUsersArray();
-      const testfolders = makeFoldersArray();
-      // // .insert(testUsers)
-      // .into('noteful_folders')
-      beforeEach('insert folders', () => {
-        // return db.then(() => {
-        return db.into('noteful_folders').insert(testfolders);
-        // });
+      const testNotes = makeNotesArray();
+      const testFolders = makeFoldersArray();
+
+      beforeEach('insert folders and notes', () => {
+        return db
+          .into('noteful_folders')
+          .insert(testFolders)
+          .then(() => {
+            return db.into('noteful_notes').insert(testNotes);
+          });
       });
+
       it('responds with 200 and all of the folders', () => {
         return supertest(app)
           .get('/api/folders')
-          .expect(200, testfolders);
+          .expect(200, testFolders);
       });
     });
   });
+
+  // Given an XSS Attack Example Passed
 
   describe(`GET /api/notes`, () => {
     context(`Given no notes`, () => {
@@ -69,7 +74,7 @@ describe('Folders Endpoints', function() {
       const testFolders = makeFoldersArray();
       const testNotes = makeNotesArray();
 
-      beforeEach('insert notes', () => {
+      beforeEach('insert folders and notes', () => {
         return db
           .into('noteful_folders')
           .insert(testFolders)

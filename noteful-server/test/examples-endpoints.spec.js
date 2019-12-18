@@ -11,7 +11,7 @@ const {
 } = require('./fixtures/examples.fixtures');
 const { makeUsersArray } = require('./fixtures/users.fixtures');
 
-describe('Examples Endpoints', function() {
+describe.skip('Examples Endpoints', function() {
   let db;
 
   before('make knex instance', () => {

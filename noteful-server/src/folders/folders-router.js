@@ -21,18 +21,17 @@ foldersRouter
       .catch(next);
   })
   .post(jsonParser, (req, res, next) => {
-    const { title, content, style, author } = req.body;
-    const newFolder = { title, content, style };
+    const { name } = req.body;
+    const newFolder = { name };
 
     for (const [key, value] of Object.entries(newFolder)) {
-      // eslint-disable-next-line eqeqeq
       if (value == null) {
         return res.status(400).json({
           error: { message: `Missing '${key}' in request body` }
         });
       }
     }
-    newFolder.author = author;
+    // newFolder.author = author;
     FoldersService.insertFolder(req.app.get('db'), newFolder)
       .then(folder => {
         res

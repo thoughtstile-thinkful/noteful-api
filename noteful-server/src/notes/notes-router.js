@@ -24,8 +24,8 @@ notesRouter
       .catch(next);
   })
   .post(jsonParser, (req, res, next) => {
-    const { title, content, style, author } = req.body;
-    const newNote = { title, content, style };
+    const { name, modified, content, folder_id } = req.body;
+    const newNote = { name, modified, content };
 
     for (const [key, value] of Object.entries(newNote)) {
       // eslint-disable-next-line eqeqeq
@@ -35,7 +35,7 @@ notesRouter
         });
       }
     }
-    newNote.author = author;
+    newNote.folder_id = folder_id;
     NotesService.insertNote(req.app.get('db'), newNote)
       .then(note => {
         res
