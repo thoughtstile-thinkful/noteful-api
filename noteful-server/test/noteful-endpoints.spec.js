@@ -8,6 +8,14 @@ const app = require('../src/app');
 const { makeNotesArray } = require('./fixtures/notes.fixtures');
 const { makeFoldersArray } = require('./fixtures/folders.fixtures');
 
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 describe('Folders Endpoints', function() {
   let db;
 
@@ -60,6 +68,63 @@ describe('Folders Endpoints', function() {
   });
 
   // Given an XSS Attack Example Passed
+
+  describe('GET /api/folders/:folder_id', () => {
+    context('Given no folder', () => {
+      it('responds with 404', () => {
+        const folder_id = uuidv4();
+        return supertest(app)
+          .get(`/api/folders/${folder_id}`)
+          .expect(404, { error: { message: "Folder doesn't exist" } });
+      });
+    });
+
+    context('Given there are examples in the database', () => {
+      const testNotes = makeNotesArray();
+      const testFolders = makeFoldersArray();
+
+      beforeEach('insert folders and notes', () => {
+        return db
+          .into('noteful_folders')
+          .insert(testFolders)
+          .then(() => {
+            return db.into('noteful_notes').insert(testNotes);
+          });
+      });
+
+      it('responds with 200 and the specified example', () => {
+        const folder_id = 'b0715efe-ffaf-11e8-8eb2-f2801f1b9fd1';
+        const expectedFolder = testFolders.find(
+          folder => (folder.id = folder_id)
+        );
+        return supertest(app)
+          .get(`/api/folders/${folder_id}`)
+          .expect(200, expectedFolder);
+      });
+    });
+  });
+
+  describe('POST /api/folders', () => {
+    it('creates an example, responding with 201 and the new example', () => {
+      const newFolder = {
+        name: 'Potato'
+      };
+      return supertest(app)
+        .post('/api/folders')
+        .send(newFolder)
+        .expect(201)
+        .expect(res => {
+          expect(res.body.name).to.eql(newFolder.name);
+          expect(res.body).to.have.property('id');
+          expect(res.headers.location).to.eql(`/api/folders/${res.body.id}`);
+        })
+        .then(res =>
+          supertest(app)
+            .get(`/api/folders/${res.body.id}`)
+            .expect(res.body)
+        );
+    });
+  });
 
   describe(`GET /api/notes`, () => {
     context(`Given no notes`, () => {
